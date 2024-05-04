@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 const StateContext = React.createContext();
 
 const StateContextProvider = ({ children }) => {
-    const { contract } = useContract("0xBD6459404378e37dB31bD01138720A3C22a33dd7")
+    const { contract } = useContract("0xA3061C576D03aCCC318046f6dD3bF04d34DC0f11")
     const address = useAddress()
 
     // contract Methods
@@ -14,6 +14,7 @@ const StateContextProvider = ({ children }) => {
     const { mutateAsync: RecordDebt } = useContractWrite(contract, "recordDebt")
     const { mutateAsync: ConfirmDebt } = useContractWrite(contract, "confirmDebt")
     const { mutateAsync: SettleDebt } = useContractWrite(contract, "settleDebt")
+    const { mutateAsync: ConfirmSettledDebt } = useContractWrite(contract, "confirmSettledDebt")
     const { mutateAsync: RemoveDebt } = useContractWrite(contract, "deleteDebt")
     const { mutateAsync: UpdateDebt } = useContractWrite(contract, "updateDebt")
 
@@ -38,9 +39,16 @@ const StateContextProvider = ({ children }) => {
         settledEvidenceFiles: item.settledEvidenceImages,
     })
     ) : [], [allDebts])
-    const myTotalCreditOwed = useMemo(() => totalCreditOwed?._hex ? convertBigNumber(totalCreditOwed._hex) : 0, [totalCreditOwed?._hex])
-    const myTotalDebtOwed = useMemo(() => totalDebtOwed?._hex ? convertBigNumber(totalDebtOwed._hex) : 0, [totalDebtOwed?._hex])
-
+    const myTotalCreditOwed = useMemo(() => {
+        console.log(totalCreditOwed);
+        return totalCreditOwed?._hex ? convertBigNumber(totalCreditOwed._hex) : 0
+    }, [totalCreditOwed?._hex])
+    const myTotalDebtOwed = useMemo(() => {
+        console.log(totalDebtOwed);
+        return totalDebtOwed?._hex ? convertBigNumber(totalDebtOwed._hex) : 0
+    }, [totalDebtOwed?._hex])
+    console.log(myTotalCreditOwed);
+    console.log(myTotalDebtOwed);
     // metaMask connect Status
     const metmaskConfig = metamaskWallet()
     const connect = useConnect()
@@ -57,9 +65,16 @@ const StateContextProvider = ({ children }) => {
     const confirmDebt = (_contractID) => {
         return ConfirmDebt({ args: [_contractID] })
     }
+    const confirmSettledDebt = (_contractID) => {
+        return ConfirmSettledDebt({ args: [_contractID] })
+    }
 
     const repayDebt = (debtID, repaymentDate, settledEvidenceImages) => {
         return SettleDebt({ args: [debtID, repaymentDate, settledEvidenceImages] })
+    }
+
+    const removeDebt = (debtID) => {
+        return RemoveDebt({ args: [debtID] })
     }
 
     const [activeNav, setActiveNav] = useState("/")
@@ -77,10 +92,11 @@ const StateContextProvider = ({ children }) => {
             isConnected,
             address,
             allContacts,
+            confirmSettledDebt,
             createDebt,
             confirmDebt,
             repayDebt,
-            RemoveDebt,
+            removeDebt,
             UpdateDebt,
             myDebts,
             myTotalCreditOwed,

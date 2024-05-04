@@ -1,0 +1,109 @@
+.home-page {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .home-page-content {
+        padding-top: 30px;
+        width: 80%;
+        max-width: 1100px;
+
+        &-area {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+
+            @media screen and (max-width: 768px) {
+                flex-direction: column;
+            }
+
+            &-card {
+                flex: 1;
+                padding: 10px;
+                min-width: 330px;
+                height: 420px;
+                display: flex;
+                flex-direction: column;
+
+                &-title {
+                    padding: 6px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                    font-weight: 600;
+                    font-size: 18px;
+                    margin-bottom: 6px;
+
+                    &-icon {
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 12px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                }
+
+                &-content {
+                    overflow-x: hidden;
+                    overflow-y: scroll;
+                }
+            }
+        }
+    }
+
+
+}
+
+.contact-card-address {
+    &-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: scroll;
+
+        &-item {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+
+            &:hover {
+                box-shadow: 10px 20px 25px -5px rgba(0, 0, 0, 0.1), 0 20px 50px -10px rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+}
+
+.AllDebtOverview {
+    width: 100%;
+    padding: 10px;
+
+    &-header {
+        padding: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 6px;
+
+            &-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 12px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+}

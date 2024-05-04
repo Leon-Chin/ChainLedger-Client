@@ -6,11 +6,11 @@ import { IoSend } from "react-icons/io5";
 import { MdCallReceived } from "react-icons/md";
 import { COLORS } from '@/constants';
 import dayjs from 'dayjs';
-import { Button, Divider, Modal, Steps, Tag, message } from 'antd';
+import { Button, Divider, Empty, Modal, Popconfirm, Spin, Steps, Tag, message } from 'antd';
 import { FaFileAlt } from "react-icons/fa";
 import { saveAs } from 'file-saver';
 import Dragger from 'antd/es/upload/Dragger';
-import { AiOutlineInbox } from 'react-icons/ai';
+import { AiFillDelete, AiOutlineDelete, AiOutlineInbox } from 'react-icons/ai';
 import { useStorageUpload } from '@thirdweb-dev/react';
 
 const STATUS = {
@@ -20,7 +20,7 @@ const STATUS = {
 }
 
 const RepayingSection = ({ debt }) => {
-    const { repayDebt } = useStateContext()
+    const { repayDebt, confirmSettledDebt } = useStateContext()
     const { mutateAsync: upload } = useStorageUpload()
     const [fileList, setFileList] = useState([]);
     const uploadToIpfs = async (file) => {
@@ -80,8 +80,18 @@ const RepayingSection = ({ debt }) => {
             setSettleLoading(false)
         })
     }
+    const [loading, setLoading] = useState(false)
     const settledConfirm = async () => {
-
+        setLoading(true)
+        await confirmSettledDebt(debt.id).then(res => {
+            console.log(res);
+            setLoading(false)
+            message.success("Confirm Successfully!")
+        }).catch(err => {
+            console.log(err);
+            setLoading(false)
+            message.error("Confirm Failed!")
+        })
     }
     const SettleButton = ({ debt }) => {
         if (debt.debtorSettledConfirmed && debt.creditorSettledConfirmed) {
@@ -90,7 +100,7 @@ const RepayingSection = ({ debt }) => {
             if (debt.isDebtor) {
                 return <Button disabled>Awaiting Creditor's Confirmation</Button>
             } else {
-                return <Button onClick={settledConfirm}>Confirm</Button>
+                return <Button loading={loading} onClick={settledConfirm}>Confirm</Button>
             }
         } else if (debt.isDebtor) {
             return <Button onClick={() => setModalOpen(true)}>Repay</Button>
@@ -117,7 +127,7 @@ const RepayingSection = ({ debt }) => {
                         <>
                             <Tag onClick={() => SaveFile(file)} className='all-debts-page-section-debt-content-initialFile-files-file' key={index}>
                                 <FaFileAlt />
-                                <p>Initial File {index + 1}</p>
+                                <p>Settle File {index + 1}</p>
                             </Tag>
                         </>
                     ))}
@@ -151,58 +161,7 @@ const RepayingSection = ({ debt }) => {
 }
 
 const InitiatialConfirmSection = ({ debt }) => {
-    const [loading, setLoading] = useState(false)
-    const Confirm = async (debtID) => {
-        setLoading(true)
-        await confirmDebt(debtID).then(res => {
-            console.log(res);
-            setLoading(false)
-        }).catch(err => {
-            console.log(err);
-            setLoading(false)
-        })
-    }
-    const SaveFile = async (fileURL) => {
-        fileURL && await fetch(fileURL).then(res => res.blob()).then(blob => {
-            saveAs(blob)
-        })
-    }
-    const ConfirmButton = ({ debt }) => {
-        if (debt.creditorInitiateConfirmed && debt.debtorInitiateConfirmed) {
-            return <Button disabled>Confirmed</Button>
-        } else if ((debt.isDebtor && debt.debtorInitiateConfirmed) || (!debt.isDebtor && debt.creditorInitiateConfirmed)) {
-            return <Button disabled>Awaiting Confirmation</Button>
-        } else {
-            return <Button onClick={() => {
-                Confirm(debt.id)
-            }} loading={loading}>Confirm</Button>
-        }
-    }
-    return <>
-        <Divider plain>Confirming Stage</Divider>
-        <div className='all-debts-page-section-debt-content'>
-            <div className='all-debts-page-section-debt-content-initialFile'>
-                {debt?.initialEvidenceFiles && debt?.initialEvidenceFiles.length !== 0 && <div className='all-debts-page-section-debt-content-initialFile-title'>
-                    Initial Files ({debt?.initialEvidenceFiles?.length}) :
-                </div>}
-                <div className='all-debts-page-section-debt-content-initialFile-files'>
-                    {debt?.initialEvidenceFiles?.map((file, index) => (
-                        <>
-                            <Tag onClick={() => SaveFile(file)} className='all-debts-page-section-debt-content-initialFile-files-file' key={index}>
-                                <FaFileAlt />
-                                <p>Initial File {index + 1}</p>
-                            </Tag>
-                        </>
-                    ))}
-                </div>
-            </div>
-            <div className='all-debts-page-section-debt-content-status'>
-                <ConfirmButton debt={debt} key={"Button_index"} />
-            </div>
-        </div>
-    </>
-}
-const SettledConfirmSection = ({ debt }) => {
+    const { confirmDebt } = useStateContext()
     const [loading, setLoading] = useState(false)
     const Confirm = async (debtID) => {
         setLoading(true)
@@ -256,6 +215,7 @@ const SettledConfirmSection = ({ debt }) => {
 }
 
 const DebtCard = ({ debt, index }) => {
+    const { removeDebt } = useStateContext()
     const isFinished = useMemo(() => debt.creditorSettledConfirmed && debt.debtorSettledConfirmed, [debt])
     const currentState = useMemo(() => {
         if (debt.repaymentDate) {
@@ -286,29 +246,60 @@ const DebtCard = ({ debt, index }) => {
             ]}
         />
     }
-
+    const [deleteLoading, setDeleteLoading] = useState(false)
+    const deleteDebt = async () => {
+        setDeleteLoading(true)
+        await removeDebt(debt.id).then(res => {
+            message.success("Debt Deleted Sucessfully!")
+            setDeleteLoading(false)
+        }).catch(err => {
+            message.error("Debt Deletion Failed!")
+            setDeleteLoading(false)
+            console.log(err);
+        })
+    }
     return <div className='all-debts-page-section-debt white-glassmorphism' key={index}>
-        <div className='all-debts-page-section-debt-header'>
-            <div className='all-debts-page-section-debt-header-BriefInfo'>
-                <div className='all-debts-page-section-debt-header-BriefInfo-icon' style={{ backgroundColor: debt.isDebtor ? COLORS.red : COLORS.green }}>
-                    {debt.isDebtor ? <MdCallReceived style={{ fontSize: 20 }} /> : <IoSend style={{ fontSize: 16 }} />}
+        <Spin spinning={deleteLoading} tip="Loading..." >
+            <div className='all-debts-page-section-debt-header'>
+                <div className='all-debts-page-section-debt-header-BriefInfo'>
+                    <div className='all-debts-page-section-debt-header-BriefInfo-icon' style={{ backgroundColor: debt.isDebtor ? COLORS.red : COLORS.green }}>
+                        {debt.isDebtor ? <MdCallReceived style={{ fontSize: 20 }} /> : <IoSend style={{ fontSize: 16 }} />}
+                    </div>
+                    <div style={{ color: COLORS.darkGray }}>
+                        {shortenAddress(debt.oppositeParty)}
+                    </div>
+                    <div>
+                        Amount (CHF): {debt.amount}
+                    </div>
                 </div>
-                <div style={{ color: COLORS.darkGray }}>
-                    {shortenAddress(debt.oppositeParty)}
-                </div>
-                <div>
-                    Amount (CHF): {debt.amount}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div className='all-debts-page-section-debt-header-date'>
+                        Due Date : {dayjs(debt.repaymentDueDate).format('DD/MM/YYYY')}
+                    </div>
+                    <div style={{ cursor: 'pointer' }}>
+                        <Popconfirm
+                            title="Are you sure delete this debt record?"
+                            onConfirm={deleteDebt}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <AiFillDelete style={{ color: COLORS.darkGray }} />
+                        </Popconfirm>
+                    </div>
                 </div>
             </div>
-            <div className='all-debts-page-section-debt-header-date'>
-                Due Date : {dayjs(debt.repaymentDueDate).format('DD/MM/YYYY')}
-            </div>
-        </div>
-        <section style={{ display: 'flex', justifyContent: 'center', marginTop: 16, padding: 20 }}>
-            <Progress />
-        </section>
-        <InitiatialConfirmSection debt={debt} />
-        {currentState >= STATUS.CONFIRMED && <RepayingSection debt={debt} />}
+            <section style={{ display: 'flex', justifyContent: 'center', marginTop: 16, padding: 20 }}>
+                <Progress />
+            </section>
+            <InitiatialConfirmSection debt={debt} />
+            {currentState >= STATUS.CONFIRMED && <RepayingSection debt={debt} />}
+        </Spin>
+    </div >
+}
+
+const EmptyCard = ({ }) => {
+    return <div className='all-debts-page-section-debt white-glassmorphism' style={{ padding: 20 }}>
+        <Empty description="No Debt" />
     </div >
 }
 
@@ -324,6 +315,7 @@ const AllDebtsPage = () => {
             </div>
             <section className='all-debts-page-section'>
                 {myDebts && myDebts.map((debt, index) => (<DebtCard debt={debt} key={index} />))}
+                {(myDebts && myDebts?.length === 0) && <EmptyCard />}
             </section>
         </div>
     )
