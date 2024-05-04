@@ -1,0 +1,97 @@
+.header-scrolled {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    background-color: hsla(0, 2%, 7%, 1);
+    background-image:
+        radial-gradient(at 84% 24%, hsla(240, 44%, 21%, 0.84) 0px, transparent 50%),
+        radial-gradient(at 22% 43%, hsla(341, 67%, 15%, 1) 0px, transparent 50%);
+    z-index: 10;
+}
+
+@media screen and (max-width: 768px) {
+    .header {
+        position: sticky;
+        top: 0;
+        padding: 10px;
+        height: 76px;
+        width: 100vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 6px
+    }
+
+    .header-navigations {
+        display: none;
+    }
+
+    .header-navigations-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        border-radius: 8px;
+        padding: 16px;
+        z-index: 10;
+    }
+
+    .header-navigations-mobile-navItem {
+        padding: 16px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 10px;
+
+        &:hover {
+            background-color: #4e4e4e;
+            cursor: pointer;
+        }
+    }
+
+}
+
+@media screen and (min-width: 768px) {
+    .header {
+        position: sticky;
+        top: 0;
+        padding: 10px 60px;
+        height: 76px;
+        width: 100vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px
+    }
+
+    .header-navigations {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .header-navigations-navItem.active {
+            background-color: #5bbc7a;
+            font-weight: 700;
+        }
+
+        .header-navigations-navItem {
+            transition: .2s;
+            padding: 10px;
+            border-radius: 8px;
+
+            a {
+                color: #fff;
+            }
+        }
+    }
+
+    .header-navigations-mobile-icon {
+        display: none;
+    }
+}

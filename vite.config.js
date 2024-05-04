@@ -8,4 +8,24 @@ export default defineConfig({
   define: {
     "process.env": {},
   },
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true,
+      },
+    },
+  },
+  build: {
+    target: 'es2020', // you can also use 'es2020' here
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2020', // you can also use 'es2020' here
+    },
+  },
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  }
 });
