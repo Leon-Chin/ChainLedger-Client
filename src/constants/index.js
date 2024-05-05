@@ -4,18 +4,23 @@ const navbars = {
         link: '/'
     },
     allDebts: {
-        name: 'All Debts',
+        name: 'Debts',
         link: '/debts'
     },
     create: {
         name: 'Create',
         link: '/create'
+    },
+    profile: {
+        name: 'Profile',
+        link: '/profile'
     }
 }
 const navItem = [
     navbars['home'],
     navbars['allDebts'],
-    navbars['create']
+    navbars['create'],
+    navbars['profile']
 ]
 
 const COLORS = {

@@ -12,6 +12,7 @@ import { saveAs } from 'file-saver';
 import Dragger from 'antd/es/upload/Dragger';
 import { AiFillDelete, AiOutlineDelete, AiOutlineInbox } from 'react-icons/ai';
 import { useStorageUpload } from '@thirdweb-dev/react';
+import UserBrief from '@/components/UserBrief';
 
 const STATUS = {
     INITIATE: 0,
@@ -266,7 +267,7 @@ const DebtCard = ({ debt, index }) => {
                         {debt.isDebtor ? <MdCallReceived style={{ fontSize: 20 }} /> : <IoSend style={{ fontSize: 16 }} />}
                     </div>
                     <div style={{ color: COLORS.darkGray }}>
-                        {shortenAddress(debt.oppositeParty)}
+                        <UserBrief contactAddress={debt.oppositeParty} />
                     </div>
                     <div>
                         Amount (CHF): {debt.amount}

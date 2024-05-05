@@ -1,17 +1,52 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import './index.less'
 import { useStateContext } from '@/context'
 import { MdCallReceived, MdContentCopy, MdPermContactCalendar } from "react-icons/md";
 import { copyToClipboard, shortenAddress } from '@/utils';
-import { Button, Empty, message } from 'antd';
+import { Avatar, Button, Empty, message } from 'antd';
 import { Card, Col, Row, Statistic } from 'antd';
 import { FiFileText } from "react-icons/fi";
 import { IoSend } from 'react-icons/io5';
-import { FaAngleRight } from 'react-icons/fa';
+import { FaAngleRight, FaUser } from 'react-icons/fa';
 import { COLORS, navbars } from '@/constants';
 import dayjs from 'dayjs';
 import ReactEcharts from "echarts-for-react";
 import { useNavigate } from 'react-router-dom';
+import { useContractRead } from '@thirdweb-dev/react';
+import UserBrief from '@/components/UserBrief';
+
+const SpecificUserCard = ({ contactAddress }) => {
+    const { userService } = useStateContext()
+    const { data: userDetails, isLoading: isGetUserInfoLoading } = useContractRead(userService, "getUserInfo", [contactAddress])
+    const userInfo = useMemo(() => {
+        return userDetails ? {
+            name: userDetails?.name,
+            avatar: userDetails?.avatar,
+            description: userDetails?.description
+        } : {
+            name: "",
+            avatar: "",
+            description: ""
+        }
+    }, [userDetails])
+
+    return <li
+        onClick={async (e) => {
+            e.preventDefault();
+            await copyToClipboard(contactAddress)
+                .then(() => message.success('Copied to clipboard'))
+                .catch(() => message.error('Copy failed'))
+        }} key={contactAddress} className='contact-card-address-list-item blue-glassmorphism'>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Avatar src={userInfo?.avatar} icon={<FaUser />} />
+            <p>{userInfo?.name}</p>
+            <p>{shortenAddress(contactAddress, true)}</p>
+        </div>
+        <span className='contact-card-address-list-item-img' >
+            <MdContentCopy />
+        </span>
+    </li>
+}
 
 const ContactCard = () => {
     const { allContacts } = useStateContext()
@@ -28,24 +63,13 @@ const ContactCard = () => {
             </div>
         </div>
         <div className='home-page-content-area-card-content'>
-            <section className='contact-card-address'>
+            {allContacts?.length !== 0 && <section className='contact-card-address'>
                 <ul className='contact-card-address-list'>
-                    {allContacts?.map(contact => <li
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            await copyToClipboard(contact)
-                                .then(() => message.success('Copied to clipboard'))
-                                .catch(() => message.error('Copy failed'))
-                        }} key={contact} className='contact-card-address-list-item blue-glassmorphism'>
-                        <p>{shortenAddress(contact, true)}</p>
-                        <span className='contact-card-address-list-item-img' >
-                            <MdContentCopy />
-                        </span>
-                    </li>)}
-                    {allContacts?.length === 0 && <Empty description="No contact found" />}
+                    {allContacts?.map(contact => <SpecificUserCard contactAddress={contact} />)}
                 </ul>
-            </section>
+            </section>}
         </div>
+        {allContacts?.length === 0 && <Empty description="No contact found" />}
     </section>
 }
 const AllDebtOverview = ({ }) => {
@@ -79,7 +103,7 @@ const AllDebtOverview = ({ }) => {
                         {debt.isDebtor ? <MdCallReceived style={{ fontSize: 20 }} /> : <IoSend style={{ fontSize: 16 }} />}
                     </div>
                     <div style={{ color: COLORS.darkGray }}>
-                        {shortenAddress(debt.oppositeParty)}
+                        <UserBrief contactAddress={debt.oppositeParty} />
                     </div>
                     <div>
                         Amount (CHF): {debt.amount}

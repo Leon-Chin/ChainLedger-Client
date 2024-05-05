@@ -6,23 +6,40 @@ import React, { useEffect, useMemo, useState } from 'react'
 const StateContext = React.createContext();
 
 const StateContextProvider = ({ children }) => {
-    const { contract } = useContract("0xA3061C576D03aCCC318046f6dD3bF04d34DC0f11")
+    const { contract: debtService } = useContract("0x6c8f42f92d85443d7239E61DB03a7D77CD51E982")
+    const { contract: userService } = useContract("0x47B0b22E3FF1f8E989170A2Dc40E927Ec6C25467")
     const address = useAddress()
 
     // contract Methods
     // write functions
-    const { mutateAsync: RecordDebt } = useContractWrite(contract, "recordDebt")
-    const { mutateAsync: ConfirmDebt } = useContractWrite(contract, "confirmDebt")
-    const { mutateAsync: SettleDebt } = useContractWrite(contract, "settleDebt")
-    const { mutateAsync: ConfirmSettledDebt } = useContractWrite(contract, "confirmSettledDebt")
-    const { mutateAsync: RemoveDebt } = useContractWrite(contract, "deleteDebt")
-    const { mutateAsync: UpdateDebt } = useContractWrite(contract, "updateDebt")
+    const { mutateAsync: RecordDebt } = useContractWrite(debtService, "recordDebt")
+    const { mutateAsync: ConfirmDebt } = useContractWrite(debtService, "confirmDebt")
+    const { mutateAsync: SettleDebt } = useContractWrite(debtService, "settleDebt")
+    const { mutateAsync: ConfirmSettledDebt } = useContractWrite(debtService, "confirmSettledDebt")
+    const { mutateAsync: RemoveDebt } = useContractWrite(debtService, "deleteDebt")
+    const { mutateAsync: UpdateDebt } = useContractWrite(debtService, "updateDebt")
+
+    const { mutateAsync: RegisterUser } = useContractWrite(userService, "registerUser")
+    const { mutateAsync: UpdateUser } = useContractWrite(userService, "updateUser")
 
     // read functions
-    const { data: allDebts, isLoading: isGetAllDebtsLoading, error: isGetAllDebtsError } = useContractRead(contract, "getAllDebts", [address])
-    const { data: totalCreditOwed, isLoading: isGetTotalCreditOwedLoading, error: isGetTotalCreditOwedError } = useContractRead(contract, "getTotalCreditOwed", [address])
-    const { data: totalDebtOwed, isLoading: isGetTotalDebtOwedLoading, error: isGetTotalDebtOwedError } = useContractRead(contract, "getTotalDebtOwed", [address])
-    const { data: allContacts, isLoading: isGetAllContactsLoading, error: isGetAllContactError } = useContractRead(contract, "getRecentTransactionPartners", [address])
+    const { data: allDebts, isLoading: isGetAllDebtsLoading, error: isGetAllDebtsError } = useContractRead(debtService, "getAllDebts", [address])
+    const { data: totalCreditOwed, isLoading: isGetTotalCreditOwedLoading, error: isGetTotalCreditOwedError } = useContractRead(debtService, "getTotalCreditOwed", [address])
+    const { data: totalDebtOwed, isLoading: isGetTotalDebtOwedLoading, error: isGetTotalDebtOwedError } = useContractRead(debtService, "getTotalDebtOwed", [address])
+    const { data: allContacts, isLoading: isGetAllContactsLoading, error: isGetAllContactError } = useContractRead(debtService, "getRecentTransactionPartners", [address])
+    const { data: userDetails, isLoading: isGetUserInfoLoading } = useContractRead(userService, "getUserInfo", [address])
+
+    const userInfo = useMemo(() => {
+        return userDetails ? {
+            name: userDetails?.name,
+            avatar: userDetails?.avatar,
+            description: userDetails?.description
+        } : {
+            name: "",
+            avatar: "",
+            description: ""
+        }
+    }, [userDetails])
 
     const myDebts = useMemo(() => allDebts ? allDebts.map(item => ({
         amount: convertBigNumber(item.amount._hex),
@@ -77,6 +94,14 @@ const StateContextProvider = ({ children }) => {
         return RemoveDebt({ args: [debtID] })
     }
 
+    const register = (name, avatar, description) => {
+        return RegisterUser({ args: [name, avatar, description] })
+    }
+
+    const update = (name, avatar, description) => {
+        return UpdateUser({ args: [name, avatar, description] })
+    }
+
     const [activeNav, setActiveNav] = useState("/")
 
     useEffect(() => {
@@ -86,8 +111,13 @@ const StateContextProvider = ({ children }) => {
     const setActiveNavBar = (path) => {
         setActiveNav(path)
     }
+
     return (
         <StateContext.Provider value={{
+            userService,
+            userInfo,
+            register,
+            update,
             connectToMetamask,
             isConnected,
             address,

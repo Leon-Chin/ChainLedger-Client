@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { navbars } from '@/constants';
 import { copyToClipboard, isAddress, shortenAddress } from '@/utils';
 import { MdContentCopy } from "react-icons/md";
+import UserBrief from '@/components/UserBrief';
 const { Dragger } = Upload;
 
 const CreateDebtPage = () => {
@@ -120,7 +121,7 @@ const CreateDebtPage = () => {
                 <section className='create-debt-page-header-address'>
                     <ul className='create-debt-page-header-address-list'>
                         {allContacts && allContacts?.map(contact => <li onClick={async (e) => { e.preventDefault(); await copyToClipboard(contact).then(() => message.success('Copied to clipboard')).catch(() => message.error('Copy failed')) }} key={contact} className='create-debt-page-header-address-list-item white-glassmorphism'>
-                            <p>{shortenAddress(contact)}</p>
+                            <UserBrief contactAddress={contact} />
                             <span className='create-debt-page-header-address-list-item-img' >
                                 <MdContentCopy />
                             </span>

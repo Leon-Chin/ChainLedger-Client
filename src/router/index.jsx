@@ -2,6 +2,7 @@ import React from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { ErrorPage } from '../components/index'
 import { CreateDebtPage, DebtsPage, HomePage, Dashboard } from '../pages/index'
+import ProfilePage from '@/pages/ProfilePage'
 const MyRouter = createBrowserRouter([
     {
         path: '/',
@@ -20,6 +21,11 @@ const MyRouter = createBrowserRouter([
             {
                 path: '/create',
                 element: <CreateDebtPage />,
+                errorElement: <ErrorPage />,
+            },
+            {
+                path: '/profile',
+                element: <ProfilePage />,
                 errorElement: <ErrorPage />,
             },
             {
