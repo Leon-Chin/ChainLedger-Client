@@ -46,8 +46,9 @@
                 }
 
                 &-content {
+                    flex: 1;
                     overflow-x: hidden;
-                    overflow-y: scroll;
+                    overflow-y: auto;
                 }
             }
         }
@@ -57,11 +58,12 @@
 }
 
 .contact-card-address {
+    height: 100%;
+
     &-list {
         display: flex;
         flex-direction: column;
         gap: 6px;
-        overflow: scroll;
 
         &-item {
             flex: 1;

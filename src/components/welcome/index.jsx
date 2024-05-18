@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import './index.less'
+import { COLORS } from '@/constants';
+import { userFriendlyICON, realTimeICON, responsiveICON, secureICON } from '@/assets/Images';
+
 const ServiceCard = ({ color, title, icon, subtitle }) => {
     const [isHover, setIsHover] = useState(false)
     return (
@@ -35,16 +38,17 @@ function Welcome() {
             <div style={{ flex: 1, margin: 30, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start' }}>
                 <div className='text-gradient' style={{ fontSize: 52, marginBottom: 20 }}>
                     Record your <br />
-                    Debit Record
+                    Debt Record
                 </div>
                 <div style={{}}>
-                    Explore the crypto world. Buy and sell cryptocurrencies easily on Krypto.
+                    Explore the Chain Ledger. Record your debt record easily on Chain Ledger.
                 </div>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <ServiceCard color={"#2952E3"} title={"Buy"} icon={<i className="fa-solid fa-dollar-sign"></i>} subtitle={" sdfa fdsafsda dsfasdfasddgasdsagas  dfasdfasddsafdsafasdfasdfdsafasdf "} />
-                <ServiceCard color={"#8945F8"} title={"Buy"} icon={<i className="fa-solid fa-dollar-sign"></i>} subtitle={" sdfa fdsafsda dsfasdfasddgasdsagas  dfasdfasddsafdsafasdfasdfdsafasdf "} />
-                <ServiceCard color={"#F84550"} title={"Buy"} icon={<i className="fa-solid fa-dollar-sign"></i>} subtitle={" sdfa fdsafsda dsfasdfasddgasdsagas  dfasdfasddsafdsafasdfasdfdsafasdf "} />
+                <ServiceCard color={"#2952E3"} title={"User-Friendly Interface"} icon={<img src={userFriendlyICON} style={{ width: 30 }} />} subtitle={"Simple and intuitive design for effortless navigation."} />
+                <ServiceCard color={"#8945F8"} title={"Real-Time Updates"} icon={<img src={realTimeICON} style={{ width: 30 }} />} subtitle={"Instant transaction recording and verification."} />
+                <ServiceCard color={"#F84550"} title={"Secure and Transparent"} icon={<img src={secureICON} style={{ width: 30 }} />} subtitle={"Blockchain technology ensures the highest security and transparency."} />
+                <ServiceCard color={COLORS.green} title={"Responsive UI"} icon={<img src={responsiveICON} style={{ width: 30 }} />} subtitle={"Fully responsive design for optimal user experience on all devices."} />
             </div>
         </div>
     )
